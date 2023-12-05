@@ -70,50 +70,44 @@ class KMPSearch {
 }
 
 
-public class Part2 {
+public class debug {
     public static void main(String[] args) throws FileNotFoundException {
         String[] numbersInWords =
                 {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 
-        File file = new File("Day01/input.txt");
-        Scanner sc = new Scanner(file);
         int sum = 0;
-        while (sc.hasNext()) {
-            String line = sc.nextLine();
-            HashSet<List<Integer>> indexes = buildIndexesSet(line, numbersInWords);
-            int tmp1 = 0;
-            int tmp2 = 0;
-            int[] firstOcurrency = new int[2];
-            int[] lastOcurrency = new int[2];
-            int[] intOcorrencys = getIntVal(line);
-            getMaxMinIndex(firstOcurrency, lastOcurrency, indexes);
-            if (verifyVet(firstOcurrency)) {
-                if (firstOcurrency[0] < intOcorrencys[0]) {
-                    tmp1 = getValue(line.substring(firstOcurrency[0], firstOcurrency[1] + 1));
-                } else {
-                    tmp1 = Character.getNumericValue(line.charAt(intOcorrencys[0]));
-                }
-                if (lastOcurrency[0] > intOcorrencys[1]) {
-                    tmp2 = getValue(line.substring(lastOcurrency[0], lastOcurrency[1] + 1));
-                } else {
-                    tmp2 = Character.getNumericValue(line.charAt(intOcorrencys[1]));
-                }
-                sum += Integer.parseInt(String.valueOf(tmp1) + String.valueOf(tmp2));
-
+        String line = "two1nine";
+        HashSet<List<Integer>> indexes = buildIndexesSet(line, numbersInWords);
+        int tmp1 = 0;
+        int tmp2 = 0;
+        int[] firstOcurrency = new int[2];
+        int[] lastOcurrency = new int[2];
+        int[] intOcorrencys = getIntVal(line);
+        getMaxMinIndex(firstOcurrency, lastOcurrency, indexes);
+        if (verifyVet(firstOcurrency)) {
+            if (firstOcurrency[0] < intOcorrencys[0]) {
+                tmp1 = getValue(line.substring(firstOcurrency[0], firstOcurrency[1] + 1));
             } else {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < intOcorrencys.length; i++) {
-                    sb.append(intOcorrencys[i]);
-                }
-                sum += Integer.parseInt(sb.toString());
+                tmp1 = Character.getNumericValue(line.charAt(intOcorrencys[0]));
             }
+            if (lastOcurrency[0] > intOcorrencys[1]) {
+                tmp2 = getValue(line.substring(lastOcurrency[0], lastOcurrency[1] + 1));
+            } else {
+                tmp2 = Character.getNumericValue(line.charAt(intOcorrencys[1]));
+            }
+            sum += Integer.parseInt(String.valueOf(tmp1) + String.valueOf(tmp2));
 
-
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < intOcorrencys.length; i++) {
+                sb.append(intOcorrencys[i]);
+            }
+            sum += Integer.parseInt(sb.toString());
         }
-        sc.close();
         System.out.println(sum);
 
     }
+
 
 
     public static boolean verifyVet(int[] vetor) {
