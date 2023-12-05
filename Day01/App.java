@@ -12,7 +12,6 @@ public class App {
         int sum = 0;
         while (sc.hasNext()) {
             sum += solve(sc.nextLine());
-            System.out.println(sum);
         }
         System.out.println(sum);
 
@@ -24,14 +23,18 @@ public class App {
         int j = 0;
         boolean kval = false;
         boolean jval = false;
+        int finalK = 0;
+        int finalJ = 0;
         int k = line.length() - 1;
         for (int i = 0; i < line.length(); i++) {
             if (Character.isDigit(line.charAt(j)) && !jval) {
                 result[0] = line.charAt(j);
+                finalJ = j;
                 jval = true; // Corrected to set jval to true
             }
             if (Character.isDigit(line.charAt(k)) && !kval) {
                 result[1] = line.charAt(k);
+                finalK = k;
                 kval = true;
             }
 

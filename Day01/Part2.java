@@ -1,80 +1,180 @@
 package Day01;
 
-class KMP_String_Matching {
-    void KMPSearch(String pat, String txt) {
-        int M = pat.length();
-        int N = txt.length();
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Iterator;
 
-        // create lps[] that will hold the longest
-        // prefix suffix values for pattern
-        int lps[] = new int[M];
-        int j = 0; // index for pat[]
+class KMPSearch {
+    public static int[] kmpSearch(String texto, String padrao) {
+        int n = texto.length();
+        int m = padrao.length();
 
-        // Preprocess the pattern (calculate lps[]
-        // array)
-        computeLPSArray(pat, M, lps);
+        int[] lps = computeLPSArray(padrao);
 
-        int i = 0; // index for txt[]
-        while ((N - i) >= (M - j)) {
-            if (pat.charAt(j) == txt.charAt(i)) {
+        int i = 0; // Índice para 'texto'
+        int j = 0; // Índice para 'padrao'
+
+        while (i < n) {
+            if (padrao.charAt(j) == texto.charAt(i)) {
+                i++;
                 j++;
-                i++;
-            }
-            if (j == M) {
-                System.out.println("Found pattern "
-                        + "at index " + (i - j));
-                j = lps[j - 1];
-            }
 
-            // mismatch after j matches
-            else if (i < N
-                    && pat.charAt(j) != txt.charAt(i)) {
-                // Do not match lps[0..lps[j-1]] characters,
-                // they will match anyway
-                if (j != 0)
+                if (j == m) {
+                    // Padrão encontrado, retorna os índices de início e fim
+                    int[] indices = {i - j, i - 1};
+                    return indices;
+                }
+            } else {
+                if (j != 0) {
                     j = lps[j - 1];
-                else
-                    i = i + 1;
-            }
-        }
-    }
-
-    void computeLPSArray(String pat, int M, int lps[]) {
-        // length of the previous longest prefix suffix
-        int len = 0;
-        int i = 1;
-        lps[0] = 0; // lps[0] is always 0
-
-        // the loop calculates lps[i] for i = 1 to M-1
-        while (i < M) {
-            if (pat.charAt(i) == pat.charAt(len)) {
-                len++;
-                lps[i] = len;
-                i++;
-            } else // (pat[i] != pat[len])
-            {
-                // This is tricky. Consider the example.
-                // AAACAAAA and i = 7. The idea is similar
-                // to search step.
-                if (len != 0) {
-                    len = lps[len - 1];
-
-                    // Also, note that we do not increment
-                    // i here
-                } else // if (len == 0)
-                {
-                    lps[i] = len;
+                } else {
                     i++;
                 }
             }
         }
-    }
-}
-public class Part2 {
 
-    public static void main(String[] args) {
-        String txt = "ABABDABACDABABCABAB";
-        String pat = "ABABCABAB";
-        new KMP_String_Matching().KMPSearch(pat, txt);
+        // Padrão não encontrado, retorna um array vazio
+        return new int[0];
     }
+
+    private static int[] computeLPSArray(String padrao) {
+        int m = padrao.length();
+        int[] lps = new int[m];
+        int length = 0;
+        int i = 1;
+
+        while (i < m) {
+            if (padrao.charAt(i) == padrao.charAt(length)) {
+                length++;
+                lps[i] = length;
+                i++;
+            } else {
+                if (length != 0) {
+                    length = lps[length - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+            }
+        }
+
+        return lps;
+    }
+
+
+}
+
+
+public class Part2 {
+    static int finalJ = 0;
+    static int finalk = 0;
+
+    public static void main(String[] args) throws FileNotFoundException {
+        String[] numbersInWords =
+                {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+
+        File file = new File("Day01/input.txt");
+        Scanner sc = new Scanner(file);
+        while (sc.hasNext()) {
+            String line = sc.nextLine();
+            HashSet<List<Integer>> indexes = buildIndexesSet(line, numbersInWords);
+            int[] firstOcurrency = new int[2];
+            int[] lastOcurrency = new int[2];
+            getMaxMinIndex(firstOcurrency, lastOcurrency, indexes);
+            
+        }
+
+
+
+    }
+
+    public static HashSet<List<Integer>> buildIndexesSet(String str, String[] patterns) {
+        HashSet<List<Integer>> indexes = new HashSet<>();
+        for (int i = 0; i < patterns.length; i++) {
+            for (int j = i + 1; j < patterns.length; j++) {
+                int[] result = KMPSearch.kmpSearch(str, patterns[i]);
+                if (result.length > 0) {
+                    List<Integer> indicesList = Arrays.asList(result[0], result[1]);
+                    if (!indexes.contains(indicesList)) {
+                        indexes.add(indicesList);
+                    }
+                }
+            }
+        }
+        return indexes;
+    }
+
+    public static void getMaxMinIndex(int[] firstOcurrency, int[] lastOcurrency,
+            HashSet<List<Integer>> indexes) {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for (List<Integer> indicesList : indexes) {
+            if (indicesList.get(0) < min) {
+                min = indicesList.get(0);
+                for (int i = 0; i < firstOcurrency.length; i++) {
+                    firstOcurrency[i] = indicesList.get(i);
+                }
+
+            }
+            if (indicesList.get(0) > max) {
+                max = indicesList.get(0);
+                for (int i = 0; i < lastOcurrency.length; i++) {
+                    lastOcurrency[i] = indicesList.get(i);
+                }
+            }
+        }
+
+    }
+
+    public static int getValue(String key) {
+        Map<String, Integer> hash = new HashMap<>();
+        hash.put("zero", 0);
+        hash.put("one", 1);
+        hash.put("two", 2);
+        hash.put("three", 3);
+        hash.put("four", 4);
+        hash.put("five", 5);
+        hash.put("six", 6);
+        hash.put("seven", 7);
+        hash.put("eight", 8);
+        hash.put("nine", 9);
+        return hash.get(key);
+    }
+
+    public static int solve(String line) {
+        char[] result = new char[2];
+        int j = 0;
+        boolean kval = false;
+        boolean jval = false;
+        finalk = 0;
+        finalJ = 0;
+        int k = line.length() - 1;
+        for (int i = 0; i < line.length(); i++) {
+            if (Character.isDigit(line.charAt(j)) && !jval) {
+                result[0] = line.charAt(j);
+                finalJ = j;
+                jval = true; // Corrected to set jval to true
+            }
+            if (Character.isDigit(line.charAt(k)) && !kval) {
+                result[1] = line.charAt(k);
+                finalk = k;
+                kval = true;
+            }
+
+            j++;
+            k--;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < result.length; i++) {
+            sb.append(result[i]);
+        }
+        return Integer.parseInt(sb.toString());
+    }
+
 }
