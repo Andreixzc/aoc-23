@@ -20,8 +20,8 @@ class KMPSearch {
 
         int[] lps = computeLPSArray(padrao);
 
-        int i = 0; //
-        int j = 0; //
+        int i = 0;
+        int j = 0;
 
         while (i < n) {
             if (padrao.charAt(j) == texto.charAt(i)) {
@@ -29,8 +29,7 @@ class KMPSearch {
                 j++;
 
                 if (j == m) {
-                    // Padrão encontrado, retorna os índices de início e fim
-                    int[] indices = { i - j, i - 1 };
+                    int[] indices = {i - j, i - 1};
                     return indices;
                 }
             } else {
@@ -41,8 +40,6 @@ class KMPSearch {
                 }
             }
         }
-
-        // Padrão não encontrado, retorna um array vazio
         return new int[0];
     }
 
@@ -72,47 +69,102 @@ class KMPSearch {
 
 }
 
+
 public class debug {
     public static void main(String[] args) throws FileNotFoundException {
-        String[] numbersInWords = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-        String line = "sevenine";
-        List<List<Integer>> result = buildIndexesSet(line, numbersInWords);
-        int[] numberIndexes = getIntVal(line);
-        System.out.println( result.get(0));
+        int sum = 0;
+        File file = new File("Day01/input.txt");
+        String[] numbersInWords =
+                {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+        String line = "onetwo";
+        int[] arr = getIntVal(line);
+        List<List<Integer>> indexSet = buildIndexesSet(line, numbersInWords);
+        System.out.println(Arrays.toString(arr));
+        System.out.println(indexSet);
+        System.out.println(calibrateLine(line, indexSet, arr));
+
+    }
+
+
+    public static int calibrateLine(String line, List<List<Integer>> indexesSet, int[] intIndex) {
+        int n1 = 0;
+        int n2 = 0;
+        if (indexesSet.isEmpty() && !verifyVet(intIndex)) {
+            return 0;
+        } else if (indexesSet.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < intIndex.length; i++) {
+                sb.append(line.indexOf(intIndex[i]));
+            }
+            return Integer.parseInt(sb.toString());
+        } else {
+            if (indexesSet.size() == 1) {
+                int begStringIndex = indexesSet.get(0).get(0);
+                if (begStringIndex < intIndex[0]) {
+                    n1 = getValue(
+                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
+                } else {
+                    n1 = line.charAt(intIndex[0]);
+                }
+                if (begStringIndex > intIndex[1]) {
+                    n2 = getValue(
+                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
+                } else {
+                    n2 = line.charAt(intIndex[1]);
+                }
+            } else {
+                int begStringIndex = indexesSet.get(0).get(0);
+                int endStringIndex = indexesSet.get(1).get(0);
+                if (begStringIndex < intIndex[0]) {
+                    n1 = getValue(
+                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
+                } else {
+                    n1 = line.charAt(intIndex[0]);
+                }
+                if (endStringIndex > intIndex[1]) {
+                    n2 = getValue(
+                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
+                } else {
+                    n2 = line.charAt(intIndex[1]);
+                }
+            }
+
+        }
+        String concatenatedString = Integer.toString(n1) + Integer.toString(n2);
+        int result = Integer.parseInt(concatenatedString);
+
+
+        return result;
     }
 
     public static List<List<Integer>> buildIndexesSet(String line, String[] padroes) {
-        List<Integer> lowestIndexes = new ArrayList<>();
-        List<Integer> highestIndexes = new ArrayList<>();
+        TreeSet<List<Integer>> indexesSet =
+                new TreeSet<>((a, b) -> Integer.compare(a.get(0), b.get(0)));
 
         for (int i = 0; i < padroes.length; i++) {
             int[] arr = KMPSearch.kmpSearch(line, padroes[i]);
             if (verifyVet(arr)) {
-                // If there are matching indexes, update the lowest and highest indexes
                 if (arr.length > 0) {
-                    lowestIndexes.add(arr[0]);
-                    highestIndexes.add(arr[arr.length - 1]);
+                    List<Integer> indexes = new ArrayList<>();
+                    indexes.add(arr[0]);
+                    indexes.add(arr[arr.length - 1]);
+                    indexesSet.add(indexes);
                 }
             }
         }
 
-        List<List<Integer>> result = new ArrayList<>();
-        result.add(lowestIndexes);
-        result.add(highestIndexes);
-        return result;
+        return new ArrayList<>(indexesSet);
     }
 
     private static class ListComparator implements Comparator<List<Integer>> {
         @Override
         public int compare(List<Integer> o1, List<Integer> o2) {
-            // Implement your custom comparison logic here
-            // For example, compare based on the first element
             return Integer.compare(o1.get(0), o2.get(0));
         }
     }
 
     public static boolean verifyVet(int[] res) {
-        return res != null && res.length > 0;
+        return res != null && res.length > 0;// true se nao for empty
     }
 
     public static int getValue(String key) {
@@ -153,7 +205,7 @@ public class debug {
             j++;
             k--;
         }
-        int[] ans = { finalJ, finalk };
+        int[] ans = {finalJ, finalk};
         return ans;
     }
 
