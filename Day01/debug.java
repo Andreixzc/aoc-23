@@ -2,12 +2,16 @@ package Day01;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeSet;
 
 class KMPSearch {
     public static int[] kmpSearch(String texto, String padrao) {
@@ -16,8 +20,8 @@ class KMPSearch {
 
         int[] lps = computeLPSArray(padrao);
 
-        int i = 0; // Índice para 'texto'
-        int j = 0; // Índice para 'padrao'
+        int i = 0; //
+        int j = 0; //
 
         while (i < n) {
             if (padrao.charAt(j) == texto.charAt(i)) {
@@ -26,7 +30,7 @@ class KMPSearch {
 
                 if (j == m) {
                     // Padrão encontrado, retorna os índices de início e fim
-                    int[] indices = {i - j, i - 1};
+                    int[] indices = { i - j, i - 1 };
                     return indices;
                 }
             } else {
@@ -66,95 +70,71 @@ class KMPSearch {
         return lps;
     }
 
-
 }
-
 
 public class debug {
     public static void main(String[] args) throws FileNotFoundException {
-        String[] numbersInWords =
-                {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
-
-        int sum = 0;
-        String line = "two1nine";
-        HashSet<List<Integer>> indexes = buildIndexesSet(line, numbersInWords);
-        int tmp1 = 0;
-        int tmp2 = 0;
-        int[] firstOcurrency = new int[2];
-        int[] lastOcurrency = new int[2];
-        int[] intOcorrencys = getIntVal(line);
-        getMaxMinIndex(firstOcurrency, lastOcurrency, indexes);
-        if (verifyVet(firstOcurrency)) {
-            if (firstOcurrency[0] < intOcorrencys[0]) {
-                tmp1 = getValue(line.substring(firstOcurrency[0], firstOcurrency[1] + 1));
-            } else {
-                tmp1 = Character.getNumericValue(line.charAt(intOcorrencys[0]));
-            }
-            if (lastOcurrency[0] > intOcorrencys[1]) {
-                tmp2 = getValue(line.substring(lastOcurrency[0], lastOcurrency[1] + 1));
-            } else {
-                tmp2 = Character.getNumericValue(line.charAt(intOcorrencys[1]));
-            }
-            sum += Integer.parseInt(String.valueOf(tmp1) + String.valueOf(tmp2));
-
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < intOcorrencys.length; i++) {
-                sb.append(intOcorrencys[i]);
-            }
-            sum += Integer.parseInt(sb.toString());
-        }
-        System.out.println(sum);
-
+        String[] numbersInWords = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+        String line = "sevenine";
+        // sevenine
+        List<List<Integer>> result = buildIndexesSet(line, numbersInWords);
+        System.out.println("Lowest Indexes: " + result.get(0));
+        System.out.println("Highest Indexes: " + result.get(1));
     }
 
+    // public static TreeSet<List<Integer>> buildIndexesSet(String line, String[] padroes) {
+    //     TreeSet<List<Integer>> set = new TreeSet<>(new ListComparator());
 
+    //     for (int i = 0; i < padroes.length; i++) {
+    //         int[] arr = KMPSearch.kmpSearch(line, padroes[i]);
+    //         List<Integer> aux = new ArrayList<>();
+    //         if (verifyVet(arr)) {
+    //             for (int j = 0; j < arr.length; j++) {
+    //                 aux.add(arr[j]);
+    //             }
+    //             set.add(new ArrayList<>(aux)); // Create a new instance of ArrayList to add to the set
+    //             aux.clear();
+    //         }
+    //     }
 
-    public static boolean verifyVet(int[] vetor) {
-        for (int elemento : vetor) {
-            if (elemento != 0) {
-                return true;
-            }
-        }
-        return false;
-    }
+    //     return set;
+    // }
 
-    public static HashSet<List<Integer>> buildIndexesSet(String str, String[] patterns) {
-        HashSet<List<Integer>> indexes = new HashSet<>();
-        for (int i = 0; i < patterns.length; i++) {
-            for (int j = i + 1; j < patterns.length; j++) {
-                int[] result = KMPSearch.kmpSearch(str, patterns[i]);
-                if (result.length > 0) {
-                    List<Integer> indicesList = Arrays.asList(result[0], result[1]);
-                    if (!indexes.contains(indicesList)) {
-                        indexes.add(indicesList);
-                    }
-                }
-            }
-        }
-        return indexes;
-    }
+    public static List<List<Integer>> buildIndexesSet(String line, String[] padroes) {
+        List<Integer> lowestIndexes = new ArrayList<>();
+        List<Integer> highestIndexes = new ArrayList<>();
 
-    public static void getMaxMinIndex(int[] firstOcurrency, int[] lastOcurrency,
-            HashSet<List<Integer>> indexes) {
-        int min = Integer.MAX_VALUE;
-        int max = Integer.MIN_VALUE;
-        for (List<Integer> indicesList : indexes) {
-            if (indicesList.get(0) < min) {
-                min = indicesList.get(0);
-                for (int i = 0; i < firstOcurrency.length; i++) {
-                    firstOcurrency[i] = indicesList.get(i);
-                }
-
-            }
-            if (indicesList.get(0) > max) {
-                max = indicesList.get(0);
-                for (int i = 0; i < lastOcurrency.length; i++) {
-                    lastOcurrency[i] = indicesList.get(i);
+        for (int i = 0; i < padroes.length; i++) {
+            int[] arr = KMPSearch.kmpSearch(line, padroes[i]);
+            if (verifyVet(arr)) {
+                // If there are matching indexes, update the lowest and highest indexes
+                if (arr.length > 0) {
+                    lowestIndexes.add(arr[0]);
+                    highestIndexes.add(arr[arr.length - 1]);
                 }
             }
         }
 
+        List<List<Integer>> result = new ArrayList<>();
+        result.add(lowestIndexes);
+        result.add(highestIndexes);
+        return result;
+    }
+
+    private static class ListComparator implements Comparator<List<Integer>> {
+        @Override
+        public int compare(List<Integer> o1, List<Integer> o2) {
+            // Implement your custom comparison logic here
+            // For example, compare based on the first element
+            return Integer.compare(o1.get(0), o2.get(0));
+        }
+    }
+
+    public static boolean verifyVet(int[] res) {
+        return res != null && res.length > 0;
+    }
+
+    public static void getMaxMinIndex(int[] firstOcurrency, int[] lastOcurrency, HashSet<List<Integer>> indexes) {
     }
 
     public static int getValue(String key) {
@@ -195,7 +175,7 @@ public class debug {
             j++;
             k--;
         }
-        int[] ans = {finalJ, finalk};
+        int[] ans = { finalJ, finalk };
         return ans;
     }
 
