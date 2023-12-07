@@ -76,29 +76,10 @@ public class debug {
     public static void main(String[] args) throws FileNotFoundException {
         String[] numbersInWords = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
         String line = "sevenine";
-        // sevenine
         List<List<Integer>> result = buildIndexesSet(line, numbersInWords);
-        System.out.println("Lowest Indexes: " + result.get(0));
-        System.out.println("Highest Indexes: " + result.get(1));
+        int[] numberIndexes = getIntVal(line);
+        System.out.println( result.get(0));
     }
-
-    // public static TreeSet<List<Integer>> buildIndexesSet(String line, String[] padroes) {
-    //     TreeSet<List<Integer>> set = new TreeSet<>(new ListComparator());
-
-    //     for (int i = 0; i < padroes.length; i++) {
-    //         int[] arr = KMPSearch.kmpSearch(line, padroes[i]);
-    //         List<Integer> aux = new ArrayList<>();
-    //         if (verifyVet(arr)) {
-    //             for (int j = 0; j < arr.length; j++) {
-    //                 aux.add(arr[j]);
-    //             }
-    //             set.add(new ArrayList<>(aux)); // Create a new instance of ArrayList to add to the set
-    //             aux.clear();
-    //         }
-    //     }
-
-    //     return set;
-    // }
 
     public static List<List<Integer>> buildIndexesSet(String line, String[] padroes) {
         List<Integer> lowestIndexes = new ArrayList<>();
@@ -132,9 +113,6 @@ public class debug {
 
     public static boolean verifyVet(int[] res) {
         return res != null && res.length > 0;
-    }
-
-    public static void getMaxMinIndex(int[] firstOcurrency, int[] lastOcurrency, HashSet<List<Integer>> indexes) {
     }
 
     public static int getValue(String key) {
