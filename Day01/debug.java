@@ -29,7 +29,7 @@ class KMPSearch {
                 j++;
 
                 if (j == m) {
-                    int[] indices = {i - j, i - 1};
+                    int[] indices = { i - j, i - 1 };
                     return indices;
                 }
             } else {
@@ -69,77 +69,142 @@ class KMPSearch {
 
 }
 
-
 public class debug {
     public static void main(String[] args) throws FileNotFoundException {
-        int sum = 0;
+       
+        String[] numbersInWords = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+        // String line = "7pqrstsixteen";
+        // List<List<Integer>> indexSet = buildIndexesSet(line, numbersInWords);
+        // if (indexSet.size() > 2) {
+        //          indexSet = minMax(indexSet);
+        //     }
+        // System.out.println(calibrateLine(line, indexSet, getIntVal(line)));
+
         File file = new File("Day01/input.txt");
-        String[] numbersInWords =
-                {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
-        String line = "onetwo";
-        int[] arr = getIntVal(line);
-        List<List<Integer>> indexSet = buildIndexesSet(line, numbersInWords);
-        System.out.println(Arrays.toString(arr));
-        System.out.println(indexSet);
-        System.out.println(calibrateLine(line, indexSet, arr));
+        Scanner sc = new Scanner(file);
+        int sum = 0;
+        while (sc.hasNext()) {
+            String line = sc.nextLine();
+            int[] arr = getIntVal(line);
+            List<List<Integer>> indexSet = buildIndexesSet(line, numbersInWords);
+            if (indexSet.size() > 2) {
+                indexSet = minMax(indexSet);
+            }
+            System.out.println(sum);
+            sum += calibrateLine(line, indexSet, arr);
+        }
+        System.out.println(sum);
+        sc.close();
 
     }
 
+    public static List<List<Integer>> minMax(List<List<Integer>> indexSet) {
+        List<List<Integer>> output = new ArrayList<>();
+        output.add(indexSet.get(0));
+        output.add(indexSet.get(indexSet.size() - 1));
+        return output;
+    }
 
     public static int calibrateLine(String line, List<List<Integer>> indexesSet, int[] intIndex) {
-        int n1 = 0;
-        int n2 = 0;
-        if (indexesSet.isEmpty() && !verifyVet(intIndex)) {
-            return 0;
-        } else if (indexesSet.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < intIndex.length; i++) {
-                sb.append(line.indexOf(intIndex[i]));
+        if (indexesSet.isEmpty()) {
+            if (intIndex[1] == 0) {
+                return Character.getNumericValue(line.charAt(intIndex[0]));
+            } else {
+                return concatenarNumeros(Character.getNumericValue(line.charAt(intIndex[0])),
+                        Character.getNumericValue(line.charAt(intIndex[1])));
             }
-            return Integer.parseInt(sb.toString());
-        } else {
-            if (indexesSet.size() == 1) {
-                int begStringIndex = indexesSet.get(0).get(0);
-                if (begStringIndex < intIndex[0]) {
-                    n1 = getValue(
-                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
+        }
+        if (!indexesSet.isEmpty() && indexesSet.size() == 1 && intIndex == null) {
+            int n1L1 = indexesSet.get(0).get(0);
+            int n2L1 = indexesSet.get(0).get(1);
+            int firstStrNumber = getValue(line.substring(n1L1, n2L1 + 1));
+            return firstStrNumber;
+        } else if (!indexesSet.isEmpty() && indexesSet.size() > 1 && intIndex == null) {
+            int n1L1 = indexesSet.get(0).get(0);
+            int n2L1 = indexesSet.get(0).get(1);
+            int n1L2 = indexesSet.get(1).get(0);
+            int n2L2 = indexesSet.get(1).get(1);
+            int firstStrNumber = getValue(line.substring(n1L1, n2L1 + 1));
+            int secondStrNumber = getValue(line.substring(n1L2, n2L2 + 1));
+            return concatenarNumeros(firstStrNumber, secondStrNumber);
+        } else if (!indexesSet.isEmpty() && indexesSet.size() == 1) {
+            int n1L1 = indexesSet.get(0).get(0);
+            int n2L1 = indexesSet.get(0).get(1);
+            int firstStrNumber = getValue(line.substring(n1L1, n2L1 + 1));
+            if (intIndex[1] == 0) {
+                int numero = Character.getNumericValue(line.charAt(intIndex[0]));
+                if (intIndex[0] < n1L1) {
+                    return concatenarNumeros(numero, firstStrNumber);
                 } else {
-                    n1 = line.charAt(intIndex[0]);
-                }
-                if (begStringIndex > intIndex[1]) {
-                    n2 = getValue(
-                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
-                } else {
-                    n2 = line.charAt(intIndex[1]);
+                    return concatenarNumeros(firstStrNumber, numero);
                 }
             } else {
-                int begStringIndex = indexesSet.get(0).get(0);
-                int endStringIndex = indexesSet.get(1).get(0);
-                if (begStringIndex < intIndex[0]) {
-                    n1 = getValue(
-                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
+                if (intIndex[1] < n2L1) {
+                    int numero1 = Character.getNumericValue(line.charAt(intIndex[0]));
+                    return concatenarNumeros(numero1, firstStrNumber);
+
                 } else {
-                    n1 = line.charAt(intIndex[0]);
-                }
-                if (endStringIndex > intIndex[1]) {
-                    n2 = getValue(
-                            line.substring(indexesSet.get(0).get(0), indexesSet.get(0).get(1) + 1));
-                } else {
-                    n2 = line.charAt(intIndex[1]);
+                    int numero1 = Character.getNumericValue(line.charAt(intIndex[0]));
+                    int numero2 = Character.getNumericValue(line.charAt(intIndex[1]));
+                    return concatenarNumeros(numero1, numero2);
                 }
             }
 
         }
-        String concatenatedString = Integer.toString(n1) + Integer.toString(n2);
-        int result = Integer.parseInt(concatenatedString);
+        if (indexesSet.size() > 1 && intIndex == null) {
+            int n1L1 = indexesSet.get(0).get(0);
+            int n2L1 = indexesSet.get(0).get(1);
+            int n1L2 = indexesSet.get(1).get(0);
+            int n2L2 = indexesSet.get(1).get(1);
+            int firstStrNumber = getValue(line.substring(n1L1, n2L1 + 1));
+            int secondStrNumber = getValue(line.substring(n1L2, n2L2 + 1));
+            return concatenarNumeros(firstStrNumber, secondStrNumber);
+        } else {
+            int n1L1 = indexesSet.get(0).get(0);
+            int n2L1 = indexesSet.get(0).get(1);
+            int n1L2 = indexesSet.get(1).get(0);
+            int n2L2 = indexesSet.get(1).get(1);
+            int firstStrNumber = getValue(line.substring(n1L1, n2L1 + 1));
+            int secondStrNumber = getValue(line.substring(n1L2, n2L2 + 1));
+            if (intIndex[0] == intIndex[1]) {
+                if (intIndex[0] > n1L1) {
+                    return concatenarNumeros(firstStrNumber, secondStrNumber);
+                } else if (n1L1 > intIndex[0]) {
+                    int numero1 = Character.getNumericValue(line.charAt(intIndex[0]));
+                    return concatenarNumeros(numero1, secondStrNumber);
+                }
+            } else {
+                if (intIndex[0] < n1L1 && intIndex[1] > n2L2) {
+                    int numero1 = Character.getNumericValue(line.charAt(intIndex[0]));
+                    int numero2 = Character.getNumericValue(line.charAt(intIndex[1]));
+                    return concatenarNumeros(numero1, numero2);
+                }
+                else if (n1L1 < intIndex[0] && intIndex[1] > n2L2) {
+                    int numero2 = Character.getNumericValue(line.charAt(intIndex[1]));
+                    return concatenarNumeros(firstStrNumber, numero2);
+                }
+            }
 
+        }
 
-        return result;
+        return 0;
+    }
+
+    public static int concatenarNumeros(int num1, int num2) {
+        // Convertendo o segundo número para uma string
+        String num2Str = String.valueOf(num2);
+
+        // Concatenando as strings dos dois números
+        String concatenacaoStr = num1 + num2Str;
+
+        // Convertendo a string resultante de volta para um número inteiro
+        int resultado = Integer.parseInt(concatenacaoStr);
+
+        return resultado;
     }
 
     public static List<List<Integer>> buildIndexesSet(String line, String[] padroes) {
-        TreeSet<List<Integer>> indexesSet =
-                new TreeSet<>((a, b) -> Integer.compare(a.get(0), b.get(0)));
+        TreeSet<List<Integer>> indexesSet = new TreeSet<>((a, b) -> Integer.compare(a.get(0), b.get(0)));
 
         for (int i = 0; i < padroes.length; i++) {
             int[] arr = KMPSearch.kmpSearch(line, padroes[i]);
@@ -190,11 +255,12 @@ public class debug {
         int finalk = 0;
         int finalJ = 0;
         int k = line.length() - 1;
+
         for (int i = 0; i < line.length(); i++) {
             if (Character.isDigit(line.charAt(j)) && !jval) {
                 result[0] = line.charAt(j);
                 finalJ = j;
-                jval = true; // Corrected to set jval to true
+                jval = true;
             }
             if (Character.isDigit(line.charAt(k)) && !kval) {
                 result[1] = line.charAt(k);
@@ -205,7 +271,13 @@ public class debug {
             j++;
             k--;
         }
-        int[] ans = {finalJ, finalk};
+
+        // Verificar se nenhum número foi encontrado
+        if (!jval && !kval) {
+            return null;
+        }
+
+        int[] ans = { finalJ, finalk };
         return ans;
     }
 
